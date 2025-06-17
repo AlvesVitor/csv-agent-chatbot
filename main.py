@@ -3,6 +3,7 @@ from utils import NFAnalyzer
 from pathlib import Path
 import pandas as pd
 import zipfile
+import io
 
 # Configuração da página
 st.set_page_config(
@@ -124,24 +125,33 @@ with st.sidebar:
                         
                         # Verifica se o arquivo é um .zip
                         if file_name.endswith('.zip'):
+                            st.info(f"📦 Processando arquivo ZIP: {file.name}")
                             # Lê o conteúdo do .zip
                             zip_content = file.getvalue()
-                            with zipfile.ZipFile(io.BytesIO(zip_content), 'r') as zip_ref:
-                                # Extrai cada arquivo do .zip
-                                for zip_info in zip_ref.infolist():
-                                    if zip_info.filename.lower().endswith('.csv'):
-                                        # Lê o conteúdo do CSV extraído
-                                        with zip_ref.open(zip_info) as csv_file:
-                                            csv_content = csv_file.read()
-                                            files_data.append({
-                                                'name': zip_info.filename,
-                                                'content': csv_content
-                                            })
-                                        st.info(f"📄 CSV extraído do .zip: {zip_info.filename}")
-                                    else:
-                                        st.warning(f"⚠️ Arquivo ignorado no .zip: {zip_info.filename} (não é CSV)")
+                            try:
+                                with zipfile.ZipFile(io.BytesIO(zip_content), 'r') as zip_ref:
+                                    # Extrai cada arquivo do .zip
+                                    for zip_info in zip_ref.infolist():
+                                        if zip_info.filename.lower().endswith('.csv'):
+                                            # Lê o conteúdo do CSV extraído
+                                            with zip_ref.open(zip_info) as csv_file:
+                                                csv_content = csv_file.read()
+                                                files_data.append({
+                                                    'name': zip_info.filename,
+                                                    'content': csv_content
+                                                })
+                                            st.info(f"📄 CSV extraído do ZIP: {zip_info.filename}")
+                                        else:
+                                            st.warning(f"⚠️ Arquivo ignorado no ZIP: {zip_info.filename} (não é CSV)")
+                            except zipfile.BadZipFile:
+                                st.error(f"❌ Erro: {file.name} não é um arquivo ZIP válido")
+                                continue
+                            except Exception as e:
+                                st.error(f"❌ Erro ao processar ZIP {file.name}: {str(e)}")
+                                continue
                         else:
                             # Arquivo é um CSV direto
+                            st.info(f"📄 Processando arquivo CSV: {file.name}")
                             files_data.append({
                                 'name': file.name,
                                 'content': file.getvalue()
@@ -150,6 +160,8 @@ with st.sidebar:
                     # Verifica se há arquivos válidos para processar
                     if not files_data:
                         raise ValueError("Nenhum arquivo CSV válido encontrado para processar.")
+                    
+                    st.info(f"📊 Total de {len(files_data)} arquivo(s) CSV encontrado(s)")
                     
                     # Processa os arquivos com o analisador
                     success = analyzer.load_data_from_uploads(files_data)
@@ -162,42 +174,13 @@ with st.sidebar:
                         st.error("❌ Erro ao processar os dados")
                         
                 except Exception as e:
-                    st.error(f"❌ Erro: {str(e)}")
+                    st.error(f"❌ Erro geral: {str(e)}")
+                    # Para debug, vamos mostrar mais detalhes do erro
+                    import traceback
+                    st.error(f"Detalhes do erro: {traceback.format_exc()}")
                 finally:
                     st.session_state.processing = False
 
-            st.session_state.processing = True
-            
-            with st.spinner("Processando arquivos..."):
-                try:
-                    # Cria o analisador
-                    analyzer = NFAnalyzer(
-                        encoding=encoding if encoding != "auto-detect" else None,
-                        separator=separator if separator != "auto-detect" else None,
-                        chunk_size=chunk_size
-                    )
-                    
-                    # Processa os arquivos
-                    files_data = []
-                    for file in uploaded_files:
-                        files_data.append({
-                            'name': file.name,
-                            'content': file.getvalue()
-                        })
-                    
-                    success = analyzer.load_data_from_uploads(files_data)
-                    
-                    if success:
-                        st.session_state.analyzer = analyzer
-                        st.session_state.data_loaded = True
-                        st.success("✅ Dados processados com sucesso!")
-                    else:
-                        st.error("❌ Erro ao processar os dados")
-                        
-                except Exception as e:
-                    st.error(f"❌ Erro: {str(e)}")
-                finally:
-                    st.session_state.processing = False
 # Layout principal
 if st.session_state.data_loaded and st.session_state.analyzer:
     # Dashboard com métricas

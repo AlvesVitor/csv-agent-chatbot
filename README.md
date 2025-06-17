@@ -1,5 +1,6 @@
 Projeto criado para cumprir os desafios de caráter eliminatório propostos pelo curso I2A2.
-___
+
+---
 
 # 🧠 CSV Agent Chatbot - Assistente Inteligente de Notas Fiscais
 
@@ -8,10 +9,13 @@ Este projeto implementa um chatbot que responde a perguntas com base em document
 ## 📑 Frameworks e Ferramentas Utilizadas
 
 ### Interface e Visualização
+
 - **Streamlit**: Framework principal para criar a interface web interativa.
 - **Pandas**: Manipulação e análise de dados dos CSVs.
 - **SQLite**: Banco de dados em memória para consultas SQL estruturada.
+
 ### Interface e Visualização
+
 - **LangChain**: Framework para construir aplicações com LLMs.
 - **ChatOpenAI**: Interface para GPT-4o-mini.
 - **OpenAIEmbeddings**: Geração de embeddings para RAG.
@@ -19,7 +23,9 @@ Este projeto implementa um chatbot que responde a perguntas com base em document
 - **ConversationBufferMemory**: Memória do histórico de conversas.
 - **FAISS**: Vector store para busca semântica (RAG).
 - **OpenAI GPT-4o-mini**: Modelo de linguagem para interpretar perguntas.
+
 ### Processamento de Dados
+
 - **chardet**: Detecção automática de encoding dos arquivos.
 - **unicodedata/re**: Normalização de nomes de colunas.
 - **python-dotenv**: Gerenciamento de variáveis de ambiente.
@@ -33,7 +39,8 @@ Este projeto implementa um chatbot que responde a perguntas com base em document
 - `langchain-community`
 - `faiss-cpu`
 - `python-dotenv`
-  
+- `chardet`
+
 ## 📂 Estrutura do Projeto
 
 O projeto espera uma pasta chamada `files/` na raiz do repositório, onde os arquivos `.csv` devem ser armazenados. Essa pasta será criada automaticamente caso não exista.
@@ -96,7 +103,7 @@ Siga os passos abaixo para configurar e executar o projeto:
 
 ## 🚀 Uso
 
-1. Acesse a interface do Streamlit no navegador e importe os arquivos .csv` ou `.zip` contendo CSVs.
+1. Acesse a interface do Streamlit no navegador e importe os arquivos .csv`ou`.zip` contendo CSVs.
 2. Clico no botão `Processar Dados` para iniciar.
 3. Faça perguntas relacionadas ao conteúdo dos documentos, e o chatbot responderá com base nas informações processadas.
 
